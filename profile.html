@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>プロフィール設定</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <style>
+        :root {
+            /* ピンクメインのカラーパレット */
+            --color-pink-light: #FFE4E1;
+            --color-pink-medium: #FFB6C1;
+            --color-pink-dark: #FF69B4;
+            --color-pink-accent: #FFC0CB;
+            --color-pink-gradient: #FFB6C1;
+
+            /* アプリケーションで使用する色変数 */
+            --primary-color: var(--color-pink-medium);
+            --secondary-color: var(--color-pink-dark);
+            --accent-color: var(--color-pink-accent);
+            --background-color: var(--color-pink-light);
+            --text-color: #1A1A1A;
+            --shadow-color: rgba(0,0,0,0.08);
+            --card-bg: rgba(255, 255, 255, 0.95);
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--color-pink-light), var(--color-pink-accent));
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            padding: 25px;
+            max-width: 1000px;
+            width: 95%;
+            margin: 30px auto;
+            background: var(--card-bg);
+            border-radius: 14px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            text-align: center;
+            min-height: 80vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 28px;
+            color: var(--text-color);
+        }
+
+        .tab-container {
+            margin-bottom: 25px;
+        }
+
+        .tab-header {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            background-color: var(--primary-color);
+            border-radius: 25px;
+            padding: 6px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .tab-button {
+            padding: 12px 25px;
+            background: transparent;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 2px 10px var(--shadow-color);
+        }
+
+        .profile-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .profile-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+
+        .profile-section h2 {
+            color: var(--text-color);
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .profile-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: #f9f9f9;
+        }
+
+        .form-group input:read-only,
+        .form-group select:disabled {
+            background-color: #f0f0f0;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>医療情報管理アプリ</h1>
+        </div>
+        
+        <div class="tab-container">
+            <div class="tab-header">
+                <button class="tab-button" onclick="location.href='choise.html'">
+                    <span class="tab-icon">👤</span>
+                    <span class="tab-text">ホーム</span>
+                </button>
+                <button class="tab-button" onclick="location.href='ai.html'">
+                    <span class="tab-icon">💬</span>
+                    <span class="tab-text">チャット</span>
+                </button>
+                <button class="tab-button" onclick="location.href='Q&A.html'">
+                    <span class="tab-icon">❓</span>
+                    <span class="tab-text">Q&A</span>
+                </button>
+                <button class="tab-button" onclick="location.href='movie.html'">
+                    <span class="tab-icon">🎬</span>
+                    <span class="tab-text">動画視聴</span>
+                </button>
+                <button class="tab-button active" onclick="location.href='profile.html'">
+                    <span class="tab-icon">👤</span>
+                    <span class="tab-text">プロフィール</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="profile-content">
+            <div class="profile-section">
+                <h2>基本情報</h2>
+                <div class="profile-form">
+                    <div class="form-group">
+                        <label for="name">お名前</label>
+                        <input type="text" id="name" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="age">年齢</label>
+                        <input type="number" id="age" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">性別</label>
+                        <select id="gender" disabled>
+                            <option value="">選択してください</option>
+                            <option value="male">男性</option>
+                            <option value="female">女性</option>
+                            <option value="other">その他</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">電話番号</label>
+                        <input type="tel" id="phone" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="address">住所</label>
+                        <input type="text" id="address" readonly>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Firebaseの初期化
+        const firebaseConfig = {
+            apiKey: "AIzaSyDXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+            authDomain: "your-app.firebaseapp.com",
+            projectId: "your-app",
+            storageBucket: "your-app.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        // ユーザー情報の取得と表示
+        document.addEventListener('DOMContentLoaded', async () => {
+            const auth = firebase.auth();
+            const db = firebase.firestore();
+
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    try {
+                        // Firestoreからユーザーデータを取得
+                        const userDoc = await db.collection('users').doc(user.uid).get();
+                        
+                        if (userDoc.exists) {
+                            const userData = userDoc.data();
+                            
+                            // 各フィールドにデータを設定
+                            document.getElementById('name').value = userData.name || '';
+                            document.getElementById('age').value = userData.age || '';
+                            document.getElementById('gender').value = userData.gender || '';
+                            document.getElementById('phone').value = userData.phone || '';
+                            document.getElementById('address').value = userData.address || '';
+                            
+                            // プロフィール画像の設定（存在する場合）
+                            if (userData.profileImage) {
+                                document.getElementById('profile-image').src = userData.profileImage;
+                            }
+                            
+                            // メールアドレスの表示
+                            document.getElementById('email').value = user.email || '';
+                            
+                            console.log('ユーザーデータを正常に取得しました:', userData);
+                        } else {
+                            console.log('ユーザードキュメントが存在しません');
+                            // 新規ユーザーの場合は空のデータを表示
+                            document.getElementById('name').value = '';
+                            document.getElementById('age').value = '';
+                            document.getElementById('gender').value = '';
+                            document.getElementById('phone').value = '';
+                            document.getElementById('address').value = '';
+                        }
+                    } catch (error) {
+                        console.error('データの取得に失敗しました:', error);
+                        alert('データの取得に失敗しました。もう一度お試しください。');
+                    }
+                } else {
+                    console.log('ユーザーがログインしていません');
+                    // 未ログインの場合はログインページにリダイレクト
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

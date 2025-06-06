@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIチャット</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* ピンクメインのカラーパレット (index.htmlと統一) */
+            --color-pink-light: #FFE4E8;
+            --color-pink: #FFB6C1;
+            --color-pink-dark: #FF7080;
+            --color-pink-accent: #FF4D6D;
+            --color-pink-gradient: #FF8FA3;
+
+            /* アプリケーションで使用する色変数 (index.htmlと統一) */
+            --primary-color: var(--color-pink);
+            --secondary-color: var(--color-pink-dark);
+            --accent-color: var(--color-pink-accent);
+            --background-color: #FFF5F6;
+            --text-color: #1A1A1A;
+            --shadow-color: rgba(255, 112, 128, 0.15);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --todo-bg: var(--card-bg);
+        }
+
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--color-pink-light), var(--color-pink));
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            padding: 25px;
+            max-width: 1000px;
+            width: 95%;
+            margin: 30px auto;
+            background: var(--card-bg);
+            border-radius: 14px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            text-align: center;
+            min-height: 80vh; /* 白背景の高さを増やす */
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-weight: 700;
+            margin-bottom: 10px;
+            font-size: 28px;
+            color: var(--text-color);
+        }
+
+        .header p {
+            font-size: 18px;
+            color: #555;
+        }
+
+        .tab-container {
+            margin-bottom: 25px;
+        }
+
+        .tab-header {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            background-color: var(--primary-color);
+            border-radius: 25px;
+            padding: 6px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .tab-button {
+            padding: 12px 25px;
+            background: transparent;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-button.active {
+            background: white;
+            color: var(--primary-color);
+            box-shadow: 0 2px 10px var(--shadow-color);
+        }
+
+        .main-content {
+            display: flex;
+            gap: 25px;
+            margin-top: 25px;
+            text-align: left;
+
+        .ai-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-top: 30px;
+        }
+
+        .ai-card {
+            background: var(--card-bg);
+            border: 2px solid var(--color-pink-light);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .ai-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px var(--shadow-color);
+            border-color: var(--primary-color);
+        }
+
+        .ai-card img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+            border: 3px solid var(--color-pink-light);
+            transition: all 0.3s ease;
+        }
+
+        .ai-card:hover img {
+            border-color: var(--primary-color);
+        }
+
+        .tab-button {
+            padding: 12px 25px;
+            background: transparent;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.8); /* テキスト色は白に近い色で維持 */
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .tab-button.active {
+            background: white;
+            color: var(--primary-color); /* アクティブ時のテキスト色をプライマリカラーに */
+            box-shadow: 0 2px 6px var(--shadow-color);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>医療情報管理アプリ</h1> <!-- タイトルを画像に合わせる -->
+            <!-- <p>利用したい機能を選んでください</p> --> <!-- 説明文は削除または変更 -->
+        </div>
+        <div class="tab-container">
+            <div class="tab-header">
+                <button class="tab-button" onclick="location.href='choise.html'">
+                    <span class="tab-icon">👤</span>
+                    <span class="tab-text">ホーム</span>
+                  </button>
+                <button class="tab-button active" onclick="location.href='ai.html'">
+                    <span class="tab-icon">💬</span>
+                    <span class="tab-text">チャット</span>
+                </button>
+                <button class="tab-button" onclick="location.href='Q&A.html'">
+                    <span class="tab-icon">❓</span>
+                    <span class="tab-text">Q&A</span>
+                </button>
+                <button class="tab-button" onclick="location.href='movie.html'">
+                    <span class="tab-icon">🎬</span>
+                    <span class="tab-text">動画視聴</span>
+                </button>
+                <button class="tab-button" onclick="location.href='profile.html'">
+                    <span class="tab-icon">👤</span>
+                    <span class="tab-text">プロフィール</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-header">
+            <h1>AIとチャット</h1>
+            <p class="subtitle">お話したいAIを選んでください</p>
+        </div>
+        
+        <div class="ai-options">
+            <div class="ai-card" onclick="startChat('teacher')">
+                <div class="card-content">
+                    <div class="icon-wrapper">
+                        <span class="ai-icon">👨‍🏫</span>
+                    </div>
+                    <h3>AI先生</h3>
+                    <p>学習や教育に関する質問に答えます</p>
+                    <button class="start-chat-btn">チャットを始める</button>
+                </div>
+            </div>
+            
+            <div class="ai-card" onclick="startChat('friend')">
+                <div class="card-content">
+                    <div class="icon-wrapper">
+                        <span class="ai-icon">👥</span>
+                    </div>
+                    <h3>AI友達</h3>
+                    <p>カジュアルな会話を楽しめます</p>
+                    <button class="start-chat-btn">チャットを始める</button>
+                </div>
+            </div>
+
+            <div class="ai-card" onclick="startChat('real')">
+                <div class="card-content">
+                    <div class="icon-wrapper">
+                        <span class="ai-icon">💬</span>
+                    </div>
+                    <h3>リアルタイム</h3>
+                    <p>実際の会話を楽しめます</p>
+                    <button class="start-chat-btn">チャットを始める</button>
+                </div>
+            </div>
+        </div>
+
+        <style>
+            .chat-header {
+                text-align: center;
+                margin-bottom: 40px;
+            }
+
+            .chat-header h1 {
+                font-size: 32px;
+                color: var(--text-color);
+                margin-bottom: 10px;
+            }
+
+            .subtitle {
+                font-size: 18px;
+                color: #666;
+            }
+
+            .ai-options {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 25px;
+                padding: 20px;
+            }
+
+            .ai-card {
+                background: white;
+                border-radius: 16px;
+                box-shadow: 0 4px 15px var(--shadow-color);
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                cursor: pointer;
+                overflow: hidden;
+            }
+
+            .ai-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 6px 20px var(--shadow-color);
+            }
+
+            .card-content {
+                padding: 25px;
+                text-align: center;
+            }
+
+            .icon-wrapper {
+                width: 80px;
+                height: 80px;
+                margin: 0 auto 20px;
+                background: var(--color-pink-light);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .ai-icon {
+                font-size: 40px;
+            }
+
+            .ai-card h3 {
+                font-size: 24px;
+                color: var(--text-color);
+                margin-bottom: 10px;
+            }
+
+            .ai-card p {
+                color: #666;
+                margin-bottom: 20px;
+                line-height: 1.5;
+            }
+
+            .start-chat-btn {
+                background: var(--primary-color);
+                color: white;
+                border: none;
+                padding: 12px 25px;
+                border-radius: 25px;
+                font-size: 16px;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+
+            .start-chat-btn:hover {
+                background: var(--secondary-color);
+            }
+        </style>
+
+       
+    </div>
+
+    <script>
+        function startChat(aiType) {
+            if (aiType === 'teacher') {
+                window.location.href = 'teacher.html';
+            } else if (aiType === 'friend') {
+                window.location.href = 'friend.html';
+            } else if (aiType === 'real') {
+                window.location.href = 'real.html';
+            }
+        }
+
+        function goBack() {
+            window.location.href = 'choise.html';
+        }
+    </script>
+</body>
+</html>
