@@ -5,125 +5,38 @@
   <title data-i18n="title">医者新規登録</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-  
+  <link rel="stylesheet" href="d_sign.css">
   <!-- Firebase CDN -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
-  <style>
-    :root {
-      --color-blue-light: #E3F2FD;
-      --color-blue: #2196F3;
-      --color-blue-dark: #1976D2;
-      --color-blue-accent: #1565C0;
-      --primary-color: var(--color-blue);
-      --secondary-color: var(--color-blue-dark);
-      --accent-color: var(--color-blue-accent);
-      --background-color: var(--color-blue-light);
-      --text-color: #1A1A1A;
-      --shadow-color: rgba(0,0,0,0.08);
-      --card-bg: rgba(255, 255, 255, 0.95);
-    }
-
-    body {
-      font-family: 'Noto Sans JP', sans-serif;
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, var(--color-blue-light), var(--color-blue-accent));
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-color);
-      line-height: 1.6;
-    }
-
-    .container {
-      background: var(--card-bg);
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 4px 6px var(--shadow-color);
-      width: 90%;
-      max-width: 500px;
-      margin: 2rem auto;
-    }
-
-    h1 {
-      text-align: center;
-      color: var(--text-color);
-      margin-bottom: 1.5rem;
-    }
-
-    .form-group {
-      margin-bottom: 1.2rem;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-    }
-
-    input, select {
-      width: 100%;
-      padding: 0.8rem;
-      border: 1px solid #ddd;
-      border-radius: 0.5rem;
-      font-size: 1rem;
-      box-sizing: border-box;
-    }
-
-    select {
-      background-color: white;
-      cursor: pointer;
-    }
-
-    button {
-      background-color: var(--primary-color);
-      color: white;
-      border: none;
-      padding: 1rem 2rem;
-      border-radius: 0.5rem;
-      font-size: 1rem;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 1rem;
-      transition: background-color 0.3s;
-    }
-
-    button:hover {
-      background-color: var(--secondary-color);
-    }
-
-    .back-link {
-      display: block;
-      margin-top: 1rem;
-      color: var(--text-color);
-      text-decoration: none;
-      text-align: center;
-    }
-
-    .back-link:hover {
-      text-decoration: underline;
-    }
-
-    @media (max-width: 480px) {
-      .container {
-        padding: 1.5rem;
-        margin: 1rem;
-      }
-
-      input, select, button {
-        padding: 0.7rem;
-      }
-    }
-  </style>
+  
+  <!-- 多言語対応スクリプト -->
+  <script src="translation.js"></script>
+  <script src="firebase-translations.js"></script>
 </head>
 <body>
+  <!-- 言語選択コンポーネント -->
+  <div class="language-selector">
+    <div class="language-selector-container">
+      <label for="languageSelect" class="language-label">
+        <span class="language-icon">🌍</span>
+        <span class="language-text" data-i18n="language">言語</span>
+      </label>
+      <select id="languageSelect" class="language-select" onchange="changeLanguage(this.value)">
+        <option value="ja" data-i18n="ja">日本語</option>
+        <option value="en" data-i18n="en">English</option>
+        <option value="zh" data-i18n="zh">中文</option>
+        <option value="ko" data-i18n="ko">한국어</option>
+        <option value="es" data-i18n="es">Español</option>
+        <option value="fr" data-i18n="fr">Français</option>
+        <option value="de" data-i18n="de">Deutsch</option>
+      </select>
+    </div>
+  </div>
+
   <div class="container">
-    <h1 data-i18n="signup-title"><h1>医療管理アプリ</h1></h1>
+    <h1 data-i18n="signup-title">医療管理アプリ</h1>
     <form id="signupForm">
       <div class="form-group">
         <label for="name" data-i18n="name">お名前</label>
@@ -157,27 +70,27 @@
         <input type="email" id="email" required>
       </div>
       <div class="form-group">
-        <label for="specialty">専門</label>
+        <label for="specialty" data-i18n="specialty">専門</label>
         <select id="specialty" required>
-          <option value="">選択してください</option>
-          <option value="内科">内科</option>
-          <option value="外科">外科</option>
-          <option value="小児科">小児科</option>
-          <option value="整形外科">整形外科</option>
-          <option value="皮膚科">皮膚科</option>
-          <option value="精神科">精神科</option>
-          <option value="眼科">眼科</option>
-          <option value="耳鼻咽喉科">耳鼻咽喉科</option>
-          <option value="産婦人科">産婦人科</option>
-          <option value="その他">その他</option>
+          <option value="" data-i18n="select">選択してください</option>
+          <option value="内科" data-i18n="internal-medicine">内科</option>
+          <option value="外科" data-i18n="surgery">外科</option>
+          <option value="小児科" data-i18n="pediatrics">小児科</option>
+          <option value="整形外科" data-i18n="orthopedics">整形外科</option>
+          <option value="皮膚科" data-i18n="dermatology">皮膚科</option>
+          <option value="精神科" data-i18n="psychiatry">精神科</option>
+          <option value="眼科" data-i18n="ophthalmology">眼科</option>
+          <option value="耳鼻咽喉科" data-i18n="otolaryngology">耳鼻咽喉科</option>
+          <option value="産婦人科" data-i18n="obstetrics-gynecology">産婦人科</option>
+          <option value="その他" data-i18n="other">その他</option>
         </select>
       </div>
       <div class="form-group">
-        <label for="hospital">病院</label>
+        <label for="hospital" data-i18n="hospital">病院</label>
         <input type="text" id="hospital">
       </div>
       <div class="form-group">
-        <label for="experience">勤務年数</label>
+        <label for="experience" data-i18n="experience">勤務年数</label>
         <input type="number" id="experience" min="0">
       </div>
       <div class="form-group">
@@ -194,6 +107,105 @@
     <a href="index.html" class="back-link" data-i18n="back-to-login">← ログイン画面に戻る</a>
   </div>
 
+  <style>
+  .language-selector {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 12px 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .language-selector:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+
+  .language-selector-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .language-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+  }
+
+  .language-icon {
+    font-size: 16px;
+  }
+
+  .language-text {
+    white-space: nowrap;
+  }
+
+  .language-select {
+    padding: 6px 12px;
+    border: 2px solid #e1e8ed;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+  }
+
+  .language-select:focus {
+    outline: none;
+    border-color: #42a5f5;
+    box-shadow: 0 0 0 3px rgba(66, 165, 245, 0.1);
+  }
+
+  .language-select:hover {
+    border-color: #42a5f5;
+  }
+
+  @media (max-width: 768px) {
+    .language-selector {
+      top: 10px;
+      right: 10px;
+      padding: 8px 12px;
+    }
+    
+    .language-label {
+      font-size: 12px;
+    }
+    
+    .language-select {
+      font-size: 12px;
+      min-width: 100px;
+      padding: 4px 8px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .language-selector {
+      position: relative;
+      top: auto;
+      right: auto;
+      margin: 10px auto;
+      width: fit-content;
+    }
+    
+    .language-text {
+      display: none;
+    }
+  }
+  </style>
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyC31W-TEE7mIBGFwrRxJAuPugjnEFfWe_k",
@@ -205,112 +217,14 @@
     };
     firebase.initializeApp(firebaseConfig);
 
-    // 多言語対応の翻訳データ
-    const translations = {
-      ja: {
-        'title': '患者新規登録',
-        'signup-title': '患者新規登録',
-        'name': 'お名前',
-        'gender': '性別',
-        'select': '選択してください',
-        'male': '男性',
-        'female': '女性',
-        'other': 'その他',
-        'age': '年齢',
-        'language': '言語選択',
-        'ja': '日本語',
-        'en': 'English',
-        'zh': '中文',
-        'ko': '한국어',
-        'email': 'メールアドレス',
-        'password': 'パスワード',
-        'confirm-password': 'パスワード（確認）',
-        'register': '登録',
-        'back-to-login': '← ログイン画面に戻る',
-        'password-mismatch': 'パスワードが一致しません',
-        'registration-success': '登録が完了しました！',
-        'registration-error': '登録に失敗しました: '
-      },
-      en: {
-        'title': 'Patient Registration',
-        'signup-title': 'Patient Registration',
-        'name': 'Name',
-        'gender': 'Gender',
-        'select': 'Please select',
-        'male': 'Male',
-        'female': 'Female',
-        'other': 'Other',
-        'age': 'Age',
-        'language': 'Language',
-        'ja': 'Japanese',
-        'en': 'English',
-        'zh': 'Chinese',
-        'ko': 'Korean',
-        'email': 'Email',
-        'password': 'Password',
-        'confirm-password': 'Confirm Password',
-        'register': 'Register',
-        'back-to-login': '← Back to Login'
-      },
-      zh: {
-        'title': '患者注册',
-        'signup-title': '患者注册',
-        'name': '姓名',
-        'gender': '性别',
-        'select': '请选择',
-        'male': '男',
-        'female': '女',
-        'other': '其他',
-        'age': '年龄',
-        'language': '语言选择',
-        'ja': '日语',
-        'en': '英语',
-        'zh': '中文',
-        'ko': '韩语',
-        'email': '电子邮件',
-        'password': '密码',
-        'confirm-password': '确认密码',
-        'register': '注册',
-        'back-to-login': '← 返回登录'
-      },
-      ko: {
-        'title': '환자 등록',
-        'signup-title': '환자 등록',
-        'name': '이름',
-        'gender': '성별',
-        'select': '선택하세요',
-        'male': '남성',
-        'female': '여성',
-        'other': '기타',
-        'age': '나이',
-        'language': '언어 선택',
-        'ja': '일본어',
-        'en': '영어',
-        'zh': '중국어',
-        'ko': '한국어',
-        'email': '이메일',
-        'password': '비밀번호',
-        'confirm-password': '비밀번호 확인',
-        'register': '등록',
-        'back-to-login': '← 로그인으로 돌아가기'
-      }
-    };
-
-    // 言語変更関数
-    function changeLanguage(lang) {
-      document.documentElement.lang = lang;
-      document.querySelectorAll('[data-i18n]').forEach(element => {
-        const key = element.getAttribute('data-i18n');
-        if (translations[lang] && translations[lang][key]) {
-          element.textContent = translations[lang][key];
-        }
-      });
-    }
+    // 新しい多言語システムを使用
+    // 翻訳データは translation.js と firebase-translations.js で管理されます
 
     document.getElementById('signupForm').addEventListener('submit', function(e) {
   e.preventDefault();
 
   const name = document.getElementById('name').value;
+  const age = document.getElementById('age').value;
   const email = document.getElementById('email').value;
   const password = document.getElementById('password').value;
   const confirmPassword = document.getElementById('confirmPassword').value;
@@ -320,7 +234,10 @@
   const experience = document.getElementById('experience').value;
 
   if (password !== confirmPassword) {
-    alert(translations[language]['password-mismatch'] || 'パスワードが一致しません');
+    const errorMessage = window.translationManager ? 
+      window.translationManager.getText('password-mismatch', 'パスワードが一致しません') : 
+      'パスワードが一致しません';
+    alert(errorMessage);
     return;
   }
 
@@ -332,6 +249,7 @@
       return firebase.firestore().collection('users').doc(user.uid).set({
         name: name,
         email: email,
+        age:age,
         language: language,
         role: 'staff',  // 医者
         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -341,13 +259,19 @@
       });
     })
     .then(() => {
-      alert(translations[language]['registration-success'] || '登録が完了しました！');
+      const successMessage = window.translationManager ? 
+        window.translationManager.getText('registration-success', '登録が完了しました！') : 
+        '登録が完了しました！';
+      alert(successMessage);
 
       // 登録後の遷移先（必要に応じて変更）
       window.location.href = 'home.html';
     })
     .catch((error) => {
-      alert((translations[language]['registration-error'] || '登録に失敗しました: ') + error.message);
+      const errorMessage = window.translationManager ? 
+        window.translationManager.getText('registration-error', '登録に失敗しました: ') : 
+        '登録に失敗しました: ';
+      alert(errorMessage + error.message);
     });
 });
 

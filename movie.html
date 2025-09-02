@@ -1,423 +1,630 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>動画視聴アプリ</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    /* 既存のスタイルを維持しつつ、緑の色調に変更 */
-    :root {
-        /* ピンクメインのカラーパレット */
-        --color-pink-light: #FFE4E8;
-        --color-pink: #FFB6C1;
-        --color-pink-dark: #FF7080;
-        --color-pink-accent: #FF4D6D;
-        --color-pink-gradient: #FF8FA3;
-        --primary-color: var(--color-pink);
-        --secondary-color: var(--color-pink-dark);
-        --accent-color: var(--color-pink-accent);
-        --background-color: #FFF5F6;
-        --text-color: #1A1A1A;
-        --shadow-color: rgba(255, 112, 128, 0.15);
-        --card-bg: rgba(255, 255, 255, 0.95);
-        --todo-bg: var(--card-bg);
-    }
-
-    /* 既存のスタイル定義は維持 */
-    body {
-        background: linear-gradient(135deg, var(--color-pink-light), var(--color-pink));
-        min-height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin: 0;
-        padding: 20px;
-    }
-
-    .container {
-        width: 100%;
-        max-width: 1200px;
-        background: var(--card-bg);
-        border-radius: 20px;
-        padding: 30px;
-        box-shadow: 0 8px 24px var(--shadow-color);
-    }
-
-    .header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-
-    .header h1 {
-        font-size: 2.5rem;
-        color: var(--primary-color);
-        margin: 0;
-        padding: 20px 0;
-    }
-
-    /* 医師向けの追加スタイル */
-    .patient-list {
-        margin-top: 20px;
-    }
-
-    .patient-item {
-        padding: 15px;
-        border-left: 4px solid var(--primary-color);
-        background: white;
-        margin-bottom: 10px;
-        border-radius: 4px;
-        box-shadow: 0 2px 4px var(--shadow-color);
-    }
-
-    .patient-item h3 {
-        margin: 0 0 5px 0;
-        color: var(--text-color);
-    }
-
-    .patient-info {
-        font-size: 14px;
-        color: #666;
-    }
-
-    .status-badge {
-        display: inline-block;
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 12px;
-        font-weight: 500;
-        margin-left: 8px;
-    }
-
-    .status-urgent {
-        background: #FFEBEE;
-        color: #D32F2F;
-    }
-
-    .status-normal {
-        background: #E8F5E9;
-        color: #2E7D32;
-    }
-
-    .tab-header {
-        display: flex;
-        justify-content: center;
-        gap: 12px;
-        background-color: var(--primary-color);
-        border-radius: 25px;
-        padding: 6px;
-        box-shadow: 0 4px 12px var(--shadow-color);
-        margin-bottom: 30px;
-    }
-
-    .tab-button {
-        padding: 12px 25px;
-        background: transparent;
-        border: none;
-        border-radius: 20px;
-        cursor: pointer;
-        font-size: 18px;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.8);
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-    }
-
-    .tab-button.active {
-        background: white;
-        color: var(--primary-color);
-        box-shadow: 0 2px 10px var(--shadow-color);
-    }
-
-    .main-content {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 30px;
-        margin-top: 30px;
-    }
-
-    /* カレンダーのスタイル */
-    .calendar {
-        background: white;
-        border-radius: 15px;
-        padding: 25px;
-        box-shadow: 0 4px 15px var(--shadow-color);
-        max-width: 600px;
-        margin: 0 auto;
-    }
-
-    .calendar-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-        padding: 0 10px;
-    }
-
-    .calendar-header h2 {
-        font-size: 1.5rem;
-        color: var(--primary-color);
-        margin: 0;
-    }
-
-    .calendar-header button {
-        background: var(--color-pink-light);
-        color: var(--primary-color);
-        border: none;
-        padding: 10px 15px;
-        border-radius: 8px;
-        cursor: pointer;
-        font-size: 1.1rem;
-        transition: all 0.3s ease;
-    }
-
-    .calendar-header button:hover {
-        background: var(--primary-color);
-        color: white;
-    }
-
-    .calendar-weekdays {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        margin-bottom: 8px;
-    }
-
-    .calendar-weekday {
-        text-align: center;
-        font-weight: 600;
-        padding: 10px 5px;
-        color: var(--primary-color);
-        font-size: 0.95rem;
-        border-bottom: 2px solid var(--color-pink-light);
-        background: #f5f9f5;
-    }
-
-    .calendar-grid {
-        display: grid;
-        grid-template-columns: repeat(7, 1fr);
-        gap: 8px;
-        padding: 0;
-        min-height: 330px;
-    }
-
-    .calendar-day {
-        aspect-ratio: 1;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        justify-content: flex-start;
-        text-align: left;
-        padding: 5px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 0.95rem;
-        position: relative;
-        transition: all 0.2s ease;
-        border: 1px solid transparent;
-        min-height: 60px;
-        box-sizing: border-box;
-    }
-    .calendar-day > span {
-        font-size: 0.95rem;
-        font-weight: bold;
-        margin-bottom: 2px;
-        margin-left: 2px;
-    }
-    .calendar-event {
-        width: 100%;
-        background: var(--color-pink-light);
-        color: var(--color-pink-accent);
-        border-radius: 8px;
-        font-size: 0.8rem;
-        margin-top: 2px;
-        padding: 2px 6px;
-        word-break: break-all;
-        display: block;
-        text-align: left;
-        font-weight: bold;
-        box-sizing: border-box;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-    .calendar-event-title {
-        font-size: 0.8rem;
-        font-weight: bold;
-        margin-right: 4px;
-    }
-    .calendar-event[data-color="blue"] {
-        background: #66BB6A;
-        color: #fff;
-    }
-    .calendar-event[data-color="red"] {
-        background: #4CAF50;
-        color: #fff;
-    }
-    .calendar-event[data-color="green"] {
-        background: #81C784;
-        color: #fff;
-    }
-    .calendar-event[data-color="yellow"] {
-        background: #A5D6A7;
-        color: #2E7D32;
-    }
-    .calendar-event[data-color="purple"] {
-        background: #388E3C;
-        color: #fff;
-    }
-    .calendar-event[data-color="orange"] {
-        background: #66BB6A;
-        color: #fff;
-    }
-    .calendar-event .event-delete {
-        margin-left: 10px;
-        color: #888;
-        font-size: 1rem;
-        cursor: pointer;
-    }
-    .calendar-event .event-edit {
-        margin-left: 2px;
-        color: #888;
-        font-size: 1rem;
-        cursor: pointer;
-    }
-    .calendar-event .event-edit:hover {
-        color: var(--color-pink-dark);
-    }
-    .event-detail-pop {
-        position: absolute;
-        z-index: 2000;
-        background: #fff;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        padding: 10px 15px;
-        min-width: 200px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.18);
-        font-size: 0.95rem;
-        color: #333;
-        top: 30px;
-        left: 0;
-        display: none;
-    }
-    .event-detail-pop.active {
-        display: block;
-    }
-
-    @media (max-width: 768px) {
-        .main-content {
-            grid-template-columns: 1fr;
-        }
-        
-        .container {
-            padding: 20px;
-        }
-    }
-
-    /* モーダルのスタイル */
-    .modal-bg {
-        display: none;
-        position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
-        background: rgba(0,0,0,0.3);
-        z-index: 1000;
-        justify-content: center;
-        align-items: center;
-    }
-    .modal-bg.active {
-        display: flex;
-    }
-    .modal {
-        background: #fff;
-        border-radius: 10px;
-        padding: 30px 20px 20px 20px;
-        min-width: 300px;
-        box-shadow: 0 4px 24px rgba(0,0,0,0.18);
-        position: relative;
-    }
-    .modal-close {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        font-size: 1.3rem;
-        color: #888;
-        cursor: pointer;
-    }
-    .modal input, .modal textarea {
-        width: 100%;
-        margin-bottom: 12px;
-        padding: 8px;
-        border-radius: 5px;
-        border: 1px solid #ccc;
-        font-size: 1rem;
-    }
-    .modal button {
-        background: var(--primary-color);
-        color: #fff;
-        border: none;
-        padding: 8px 18px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1rem;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>動画学習</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="maintab.css">
+    <link rel="stylesheet" href="responsive.css">
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h1>医療情報管理アプリ</h1>
-    </div>
-    
-    <div class="tab-container">
-      <div class="tab-header">
-        <button class="tab-button" onclick="location.href='choise.html'">
-          <span class="tab-icon">👤</span>
-          <span class="tab-text">ホーム</span>
-        </button>
-        <button class="tab-button" onclick="location.href='ai.html'">
-          <span class="tab-icon">💬</span>
-          <span class="tab-text">チャット</span>
-        </button>
-        <button class="tab-button" onclick="location.href='score.html'">
-          <span class="tab-icon">❓</span>
-          <span class="tab-text">Q&A</span>
-        </button>
-        <button class="tab-button active" onclick="location.href='movie.html'">
-          <span class="tab-icon">🎬</span>
-          <span class="tab-text">動画視聴</span>
-        </button>
-        <button class="tab-button" onclick="location.href='profile.html'">
-          <span class="tab-icon">👤</span>
-          <span class="tab-text">プロフィール</span>
-        </button>
-      </div>
+    <div class="container">
+        <div class="header">
+            <h1>動画学習</h1>
+        </div>
+        
+        <div class="tab-container">
+            <div class="tab-header">
+                <button class="tab-button" onclick="location.href='ai.html'">
+                    <span class="tab-icon">🤖</span>
+                    <span class="tab-text">AI学習</span>
+                </button>
+                <button class="tab-button active" onclick="location.href='movie.html'">
+                    <span class="tab-icon">🎬</span>
+                    <span class="tab-text">動画学習</span>
+                </button>
+                <button class="tab-button" onclick="location.href='allq&a.html'">
+                    <span class="tab-icon">📝</span>
+                    <span class="tab-text">クイズ</span>
+                </button>
+                <button class="tab-button" onclick="location.href='score.html'">
+                    <span class="tab-icon">📊</span>
+                    <span class="tab-text">成績</span>
+                </button>
+            </div>
+            
+            <!-- モバイル用ハンバーガーメニュー -->
+            <button class="hamburger-menu show-mobile">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+        
+        <!-- モバイルメニュー -->
+        <div class="mobile-menu">
+            <a href="ai.html">🤖 AI学習</a>
+            <a href="movie.html">🎬 動画学習</a>
+            <a href="allq&a.html">📝 クイズ</a>
+            <a href="score.html">📊 成績</a>
+        </div>
+
+        <div class="content-area">
+            <div class="video-section">
+                <h2>動画を選択してください</h2>
+                <div class="video-grid" id="videoGrid">
+                    <!-- 動画がここに動的に追加されます -->
+                </div>
+            </div>
+            
+            <div class="quiz-section" id="quizSection" style="display: none;">
+                <h2>動画視聴後のクイズ</h2>
+                <div id="quizContainer">
+                    <!-- クイズがここに表示されます -->
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="video-container">
-      <!-- ローカル動画再生 -->
-      <video id="myVideo" controls>
-        <source src="video.mp4" type="video/mp4">
-        このブラウザは video タグをサポートしていません。
-      </video>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="responsive.js"></script>
+    <script>
+        // Firebase設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyC31W-TEE7mIBGFwrRxJAuPugjnEFfWe_k",
+            authDomain: "web01-2484d.firebaseapp.com",
+            projectId: "web01-2484d",
+            storageBucket: "web01-2484d.appspot.com",
+            messagingSenderId: "90159472898",
+            appId: "1:90159472898:web:261ec71f9919611011e21b"
+        };
 
-      <!-- YouTube埋め込み例 -->
-      <h3>YouTubeから再生</h3>
-      <iframe
-        src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        title="YouTube video"
-        frameborder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen>
-      </iframe>
-    </div>
-    <button onclick="goBack()" class="back-btn">← 戻る</button>
-  </div>
+        // Firebase初期化
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-  <script>
-    function goBack() {
-      window.location.href = 'index.html';
-    }
-  </script>
+        let currentUser = null;
+        let currentVideo = null;
+        let quizData = [];
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
+
+        // 動画データ
+        const videos = [
+            {
+                id: 'tuberculosis_a1',
+                title: '結核について - 基礎知識',
+                description: '結核の基本的な知識について学びます',
+                filename: 'videostuberculosis_a1.mp4',
+                duration: '5分'
+            },
+            {
+                id: 'tuberculosis_about1',
+                title: '結核の症状と診断',
+                description: '結核の症状と診断方法について学びます',
+                filename: 'videostuberculosis_about1.mp4',
+                duration: '7分'
+            },
+            {
+                id: 'tuberculosis_about2',
+                title: '結核の治療と予防',
+                description: '結核の治療法と予防策について学びます',
+                filename: 'videostuberculosis_about2.mp4',
+                duration: '6分'
+            },
+            {
+                id: 'tuberculosis_about3',
+                title: '結核の疫学',
+                description: '結核の流行状況と統計について学びます',
+                filename: 'videostuberculosis_about3.mp4',
+                duration: '8分'
+            },
+            {
+                id: 'tuberculosis_about4',
+                title: '結核の研究動向',
+                description: '結核研究の最新動向について学びます',
+                filename: 'videostuberculosis_about4.mp4',
+                duration: '9分'
+            }
+        ];
+
+        // クイズデータ
+        const quizQuestions = [
+            {
+                question: '結核は主にどの臓器に影響を与えますか？',
+                choices: ['心臓', '肺', '肝臓', '腎臓'],
+                correct: 1,
+                explanation: '結核は主に肺に影響を与える呼吸器感染症です。'
+            },
+            {
+                question: '結核の主な症状は何ですか？',
+                choices: ['腹痛', '頭痛', '咳と痰', '関節痛'],
+                correct: 2,
+                explanation: '結核の主な症状は咳と痰、発熱、体重減少などです。'
+            },
+            {
+                question: '結核の診断に最も重要な検査は何ですか？',
+                choices: ['血液検査', 'レントゲン検査', '尿検査', '心電図'],
+                correct: 1,
+                explanation: '胸部レントゲン検査は結核の診断に最も重要です。'
+            },
+            {
+                question: '結核の治療期間は通常どのくらいですか？',
+                choices: ['1週間', '1ヶ月', '6ヶ月', '1年'],
+                correct: 2,
+                explanation: '結核の標準治療は通常6ヶ月間です。'
+            },
+            {
+                question: '結核の予防に最も効果的な方法は何ですか？',
+                choices: ['手洗い', 'BCGワクチン', 'マスク着用', '運動'],
+                correct: 1,
+                explanation: 'BCGワクチンは結核の予防に最も効果的です。'
+            }
+        ];
+
+        // ユーザー認証状態の監視
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                currentUser = user;
+                displayVideos();
+            } else {
+                console.log('ユーザーがログインしていません');
+            }
+        });
+
+        // 動画一覧の表示
+        function displayVideos() {
+            const videoGrid = document.getElementById('videoGrid');
+            videoGrid.innerHTML = '';
+
+            videos.forEach(video => {
+                const videoCard = document.createElement('div');
+                videoCard.className = 'video-card';
+                videoCard.onclick = () => playVideo(video);
+                
+                videoCard.innerHTML = `
+                    <div class="video-thumbnail">
+                        <div class="play-icon">▶️</div>
+                    </div>
+                    <div class="video-info">
+                        <h3>${video.title}</h3>
+                        <p>${video.description}</p>
+                        <span class="duration">${video.duration}</span>
+                    </div>
+                `;
+                
+                videoGrid.appendChild(videoCard);
+            });
+        }
+
+        // 動画再生
+        function playVideo(video) {
+            currentVideo = video;
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            
+            const videoSection = document.querySelector('.video-section');
+            const quizSection = document.getElementById('quizSection');
+            
+            videoSection.innerHTML = `
+                <div class="video-player">
+                    <h2>${video.title}</h2>
+                    <video id="videoPlayer" controls width="100%" max-width="800">
+                        <source src="videos/${video.filename}" type="video/mp4">
+                        お使いのブラウザは動画再生に対応していません。
+                    </video>
+                    <div class="video-controls">
+                        <button onclick="showQuiz()" class="quiz-btn">クイズを開始</button>
+                        <button onclick="backToVideos()" class="back-btn">動画一覧に戻る</button>
+                    </div>
+                </div>
+            `;
+            
+            // 動画終了時のイベント
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.addEventListener('ended', () => {
+                showQuiz();
+            });
+        }
+
+        // 動画一覧に戻る
+        function backToVideos() {
+            const videoSection = document.querySelector('.video-section');
+            const quizSection = document.getElementById('quizSection');
+            
+            videoSection.innerHTML = `
+                <h2>動画を選択してください</h2>
+                <div class="video-grid" id="videoGrid"></div>
+            `;
+            
+            quizSection.style.display = 'none';
+            displayVideos();
+        }
+
+        // クイズ表示
+        function showQuiz() {
+            const quizSection = document.getElementById('quizSection');
+            quizSection.style.display = 'block';
+            
+            displayQuestion();
+        }
+
+        // 問題表示
+        function displayQuestion() {
+            if (currentQuestionIndex >= 5) {
+                showResults();
+                return;
+            }
+            
+            const question = quizQuestions[currentQuestionIndex];
+            const quizContainer = document.getElementById('quizContainer');
+            
+            quizContainer.innerHTML = `
+                <div class="question-card">
+                    <h3>問題 ${currentQuestionIndex + 1}/5</h3>
+                    <p class="question-text">${question.question}</p>
+                    <div class="choices">
+                        ${question.choices.map((choice, index) => `
+                            <button class="choice-btn" onclick="selectAnswer(${index})">
+                                ${choice}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // 回答選択
+        function selectAnswer(selectedIndex) {
+            const question = quizQuestions[currentQuestionIndex];
+            const isCorrect = selectedIndex === question.correct;
+            
+            if (isCorrect) {
+                correctAnswers++;
+            }
+            
+            // 正解・不正解の表示
+            const quizContainer = document.getElementById('quizContainer');
+            quizContainer.innerHTML = `
+                <div class="result-card ${isCorrect ? 'correct' : 'incorrect'}">
+                    <h3>${isCorrect ? '正解！' : '不正解'}</h3>
+                    <p class="explanation">${question.explanation}</p>
+                    <button onclick="nextQuestion()" class="next-btn">次の問題</button>
+                </div>
+            `;
+        }
+
+        // 次の問題
+        function nextQuestion() {
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        // 結果表示
+        function showResults() {
+            const accuracy = correctAnswers / 5;
+            const quizContainer = document.getElementById('quizContainer');
+            
+            quizContainer.innerHTML = `
+                <div class="results-card">
+                    <h3>クイズ完了！</h3>
+                    <div class="score-display">
+                        <p>正解数: ${correctAnswers}/5</p>
+                        <p>正答率: ${Math.round(accuracy * 100)}%</p>
+                    </div>
+                    <div class="result-buttons">
+                        <button onclick="saveResults()" class="save-btn">結果を保存</button>
+                        <button onclick="backToVideos()" class="back-btn">動画一覧に戻る</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 結果保存
+        async function saveResults() {
+            try {
+                const accuracy = correctAnswers / 5;
+                
+                await db.collection('movie_quiz_scores').add({
+                    userId: currentUser.uid,
+                    videoId: currentVideo.id,
+                    videoTitle: currentVideo.title,
+                    correctAnswers: correctAnswers,
+                    totalQuestions: 5,
+                    accuracy: accuracy,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                alert('結果が保存されました！');
+                backToVideos();
+            } catch (error) {
+                console.error('結果の保存に失敗:', error);
+                alert('結果の保存に失敗しました。');
+            }
+        }
+    </script>
+
+    <style>
+        .content-area {
+            padding: 2rem 0;
+        }
+
+        .video-section h2 {
+            color: var(--text-color);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .video-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .video-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(67, 160, 71, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .video-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(67, 160, 71, 0.2);
+        }
+
+        .video-thumbnail {
+            height: 200px;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .play-icon {
+            font-size: 3rem;
+            color: #43a047;
+        }
+
+        .video-info {
+            padding: 1.5rem;
+        }
+
+        .video-info h3 {
+            color: var(--text-color);
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .video-info p {
+            color: #666;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .duration {
+            color: #43a047;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .video-player {
+            text-align: center;
+        }
+
+        .video-player h2 {
+            color: var(--text-color);
+            margin-bottom: 1.5rem;
+        }
+
+        .video-controls {
+            margin-top: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .quiz-btn, .back-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .quiz-btn {
+            background: #43a047;
+            color: white;
+        }
+
+        .quiz-btn:hover {
+            background: #2e7d32;
+        }
+
+        .back-btn {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .back-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .quiz-section {
+            margin-top: 2rem;
+        }
+
+        .quiz-section h2 {
+            color: var(--text-color);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .question-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(67, 160, 71, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .question-card h3 {
+            color: #43a047;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .choices {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .choice-btn {
+            padding: 1rem;
+            border: 2px solid #e8f5e9;
+            border-radius: 8px;
+            background: white;
+            color: var(--text-color);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .choice-btn:hover {
+            border-color: #43a047;
+            background: #f1f8e9;
+        }
+
+        .result-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(67, 160, 71, 0.1);
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .result-card.correct h3 {
+            color: #43a047;
+        }
+
+        .result-card.incorrect h3 {
+            color: #f44336;
+        }
+
+        .explanation {
+            color: #666;
+            margin: 1rem 0;
+            line-height: 1.6;
+        }
+
+        .next-btn {
+            background: #43a047;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .next-btn:hover {
+            background: #2e7d32;
+        }
+
+        .results-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(67, 160, 71, 0.1);
+            text-align: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .results-card h3 {
+            color: #43a047;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-display {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #f1f8e9;
+            border-radius: 8px;
+        }
+
+        .score-display p {
+            margin: 0.5rem 0;
+            font-size: 1.1rem;
+            color: var(--text-color);
+        }
+
+        .result-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .save-btn {
+            background: #43a047;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: #2e7d32;
+        }
+
+        @media (max-width: 768px) {
+            .video-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .video-controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .question-card, .result-card, .results-card {
+                margin: 0 1rem;
+                padding: 1.5rem;
+            }
+
+            .choices {
+                grid-template-columns: 1fr;
+            }
+
+            .result-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
 </body>
 </html>

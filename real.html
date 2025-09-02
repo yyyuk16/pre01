@@ -1,285 +1,515 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Firebase リアルタイムチャット</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-        /* ピンクメインのカラーパレット */
-        --color-pink-light: #FFE4E8;
-        --color-pink: #FFB6C1;
-        --color-pink-dark: #FF7080;
-        --color-pink-accent: #FF4D6D;
-        --color-pink-gradient: #FF8FA3;
-        --primary-color: var(--color-pink);
-        --secondary-color: var(--color-pink-dark);
-        --accent-color: var(--color-pink-accent);
-        --background-color: #FFF5F6;
-        --text-color: #1A1A1A;
-        --shadow-color: rgba(255, 112, 128, 0.15);
-        --card-bg: rgba(255, 255, 255, 0.95);
-        --todo-bg: var(--card-bg);
-    }
-    body {
-      font-family: 'Noto Sans JP', sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: linear-gradient(135deg, var(--color-pink-light), var(--color-pink));
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      color: var(--text-color);
-    }
-
-    h2 {
-      margin-bottom: 4px;
-    }
-
-    #assignedDoctorContainer {
-      margin-bottom: 12px;
-      font-weight: 500;
-      font-size: 18px;
-    }
-
-    #chat {
-      height: 400px;
-      overflow-y: auto;
-      background: var(--card-bg);
-      border-radius: 14px;
-      padding: 20px;
-      margin: 10px 0 20px;
-      box-shadow: 0 4px 12px var(--shadow-color);
-      width: 90%;
-      max-width: 800px;
-      white-space: pre-wrap;
-    }
-
-    .message {
-      margin: 10px 0;
-      padding: 10px;
-      background: var(--color-pink-light);
-      border-radius: 8px;
-      font-size: 16px;
-      max-width: 70%;
-      word-wrap: break-word;
-    }
-    /* 自分のメッセージは右寄せ */
-    .message.self {
-      background: var(--color-pink-dark);
-      color: white;
-      margin-left: auto;
-    }
-
-    .input-container {
-      width: 90%;
-      max-width: 800px;
-      display: flex;
-      gap: 8px;
-    }
-
-    input[type="text"] {
-      flex-grow: 1;
-      padding: 12px;
-      border: 2px solid var(--color-pink-light);
-      border-radius: 8px;
-      font-size: 16px;
-      transition: all 0.3s ease;
-    }
-
-    input[type="text"]:focus {
-      border-color: var(--secondary-color);
-      box-shadow: 0 0 8px var(--shadow-color);
-      outline: none;
-    }
-
-    button {
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      color: white;
-      border: none;
-      padding: 14px 28px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 16px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-    }
-
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px var(--shadow-color);
-    }
-
-    .language-selector {
-      margin-bottom: 10px;
-      width: 90%;
-      max-width: 800px;
-      text-align: right;
-    }
-    select {
-      font-size: 16px;
-      padding: 6px 12px;
-      border-radius: 8px;
-      border: 2px solid var(--color-pink-light);
-      background: white;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>リアルタイムチャット</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="maintab.css">
+    <link rel="stylesheet" href="responsive.css">
 </head>
 <body>
-  <h2>リアルタイムチャット（患者用）</h2>
+    <div class="container">
+        <div class="header">
+            <h1>リアルタイムチャット</h1>
+        </div>
+        
+        <div class="tab-container">
+            <div class="tab-header">
+                <button class="tab-button" onclick="location.href='ai.html'">
+                    <span class="tab-icon">🤖</span>
+                    <span class="tab-text">AI学習</span>
+                </button>
+                <button class="tab-button" onclick="location.href='movie.html'">
+                    <span class="tab-icon">🎬</span>
+                    <span class="tab-text">動画学習</span>
+                </button>
+                <button class="tab-button" onclick="location.href='allq&a.html'">
+                    <span class="tab-icon">📝</span>
+                    <span class="tab-text">クイズ</span>
+                </button>
+                <button class="tab-button" onclick="location.href='score.html'">
+                    <span class="tab-icon">📊</span>
+                    <span class="tab-text">成績</span>
+                </button>
+            </div>
+            
+            <!-- モバイル用ハンバーガーメニュー -->
+            <button class="hamburger-menu show-mobile">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+        
+        <!-- モバイルメニュー -->
+        <div class="mobile-menu">
+            <a href="ai.html">🤖 AI学習</a>
+            <a href="movie.html">🎬 動画学習</a>
+            <a href="allq&a.html">📝 クイズ</a>
+            <a href="score.html">📊 成績</a>
+        </div>
 
-  <div id="assignedDoctorContainer">
-    担当医者: <span id="assignedDoctorName">読み込み中...</span>
-  </div>
+        <div class="content-area">
+            <div class="doctor-info">
+                <h2>担当医師情報</h2>
+                <div class="doctor-card">
+                    <div class="doctor-avatar">👨‍⚕️</div>
+                    <div class="doctor-details">
+                        <h3 id="doctorName">読み込み中...</h3>
+                        <p id="doctorStatus">担当医師を確認中...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-header">
+                    <h3>チャット</h3>
+                    <div class="chat-status" id="chatStatus">接続中...</div>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="welcome-message">
+                        <p>担当医師とのチャットを開始できます</p>
+                    </div>
+                </div>
+                
+                <div class="chat-input-area">
+                    <div class="input-container">
+                        <input type="text" id="messageInput" placeholder="メッセージを入力..." maxlength="500">
+                        <button onclick="sendMessage()" id="sendButton">送信</button>
+                    </div>
+                    <div class="input-info">
+                        <span id="charCount">0/500</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  <div class="language-selector">
-    <label for="languageSelect">表示言語: </label>
-    <select id="languageSelect">
-      <option value="ja" selected>日本語</option>
-      <option value="en">English</option>
-      <option value="zh">中文</option>
-      <option value="ko">한국어</option>
-      <option value="es">Español</option>
-      <option value="fr">Français</option>
-    </select>
-  </div>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="responsive.js"></script>
+    <script>
+        // Firebase設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyC31W-TEE7mIBGFwrRxJAuPugjnEFfWe_k",
+            authDomain: "web01-2484d.firebaseapp.com",
+            projectId: "web01-2484d",
+            storageBucket: "web01-2484d.appspot.com",
+            messagingSenderId: "90159472898",
+            appId: "1:90159472898:web:261ec71f9919611011e21b"
+        };
 
-  <div id="chat"></div>
+        // Firebase初期化
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-  <div class="input-container">
-    <input type="text" id="messageInput" placeholder="メッセージを入力" autocomplete="off" />
-    <button id="sendBtn">送信</button>
-    <button onclick="window.location.href='choise.html'">戻る</button>
-  </div>
+        let currentUser = null;
+        let assignedDoctor = null;
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
-    import { getDatabase, ref, push, onChildAdded } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-firestore.js";
+        // ユーザー認証状態の監視
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                currentUser = user;
+                loadDoctorInfo();
+                setupChat();
+            } else {
+                console.log('ユーザーがログインしていません');
+            }
+        });
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyC31W-TEE7mIBGFwrRxJAuPugjnEFfWe_k",
-      authDomain: "web01-2484d.firebaseapp.com",
-      databaseURL: "https://web01-2484d-default-rtdb.firebaseio.com",
-      projectId: "web01-2484d",
-      storageBucket: "web01-2484d.appspot.com",
-      messagingSenderId: "90159472898",
-      appId: "1:90159472898:web:8a33ef04b4474b9911e21b",
-      measurementId: "G-148XJR01WS"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const auth = getAuth(app);
-    const firestore = getFirestore(app);
-
-    let currentUserUid = null;
-    let assignedDoctorUid = null;
-    let chatRoomId = null;
-
-    const chatDiv = document.getElementById("chat");
-    const messageInput = document.getElementById("messageInput");
-    const sendBtn = document.getElementById("sendBtn");
-    const assignedDoctorNameElem = document.getElementById("assignedDoctorName");
-    const languageSelect = document.getElementById("languageSelect");
-
-    // ユーザー情報取得（Firestore usersコレクションから）
-    async function getUserInfo(uid) {
-      try {
-        const userDocRef = doc(firestore, "users", uid);
-        const userDocSnap = await getDoc(userDocRef);
-        if (userDocSnap.exists()) {
-          return userDocSnap.data();
+        // 担当医師情報の読み込み
+        async function loadDoctorInfo() {
+            try {
+                const userDoc = await db.collection('users').doc(currentUser.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    const doctorUid = userData.assignedDoctorUid;
+                    
+                    if (doctorUid) {
+                        const doctorDoc = await db.collection('users').doc(doctorUid).get();
+                        if (doctorDoc.exists) {
+                            assignedDoctor = doctorDoc.data();
+                            displayDoctorInfo();
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('担当医師情報の読み込みに失敗:', error);
+            }
         }
-      } catch (error) {
-        console.error("ユーザー情報取得エラー:", error);
-      }
-      return { userName: "名無し", language: "ja" };
-    }
 
-    // 担当医者名表示
-    async function displayAssignedDoctor() {
-      if (!assignedDoctorUid) {
-        assignedDoctorNameElem.textContent = "担当医者なし";
-        return;
-      }
-      const doctorInfo = await getUserInfo(assignedDoctorUid);
-      assignedDoctorNameElem.textContent = doctorInfo.userName || "担当医者なし";
-    }
+        // 担当医師情報の表示
+        function displayDoctorInfo() {
+            if (assignedDoctor) {
+                document.getElementById('doctorName').textContent = assignedDoctor.displayName || '担当医師';
+                document.getElementById('doctorStatus').textContent = 'オンライン';
+            } else {
+                document.getElementById('doctorName').textContent = '担当医師未設定';
+                document.getElementById('doctorStatus').textContent = '担当医師が設定されていません';
+            }
+        }
 
-    // メッセージ表示関数
-    function displayMessage(msg) {
-      const el = document.createElement("div");
-      el.classList.add("message");
-      if (msg.sender === currentUserUid) {
-        el.classList.add("self");
-        el.textContent = `あなた: ${msg.text}`;
-      } else {
-        el.textContent = `担当医: ${msg.text}`;
-      }
-      chatDiv.appendChild(el);
-      chatDiv.scrollTop = chatDiv.scrollHeight;
-    }
+        // チャットの設定
+        function setupChat() {
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
+            const charCount = document.getElementById('charCount');
 
-    // メッセージ送信
-    sendBtn.addEventListener("click", () => {
-      const text = messageInput.value.trim();
-      if (!text) return;
-      if (!chatRoomId) {
-        alert("チャットルームが設定されていません");
-        return;
-      }
-      const chatRef = ref(db, "messages/" + chatRoomId);
-      push(chatRef, {
-        sender: currentUserUid,
-        text: text,
-        timestamp: Date.now()
-      });
-      messageInput.value = "";
-    });
+            // 文字数カウント
+            messageInput.addEventListener('input', function() {
+                const length = this.value.length;
+                charCount.textContent = `${length}/500`;
+                
+                if (length > 450) {
+                    charCount.style.color = '#f44336';
+                } else if (length > 400) {
+                    charCount.style.color = '#ff9800';
+                } else {
+                    charCount.style.color = '#666';
+                }
+            });
 
-    // Enterキーで送信
-    messageInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        sendBtn.click();
-      }
-    });
+            // Enterキーで送信
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
 
-    // ログイン状態監視
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        alert("ログインしてください");
-        window.location.href = "login.html";
-        return;
-      }
-      currentUserUid = user.uid;
+            // 送信ボタンの有効/無効
+            messageInput.addEventListener('input', function() {
+                sendButton.disabled = this.value.trim().length === 0;
+            });
 
-      // ユーザー情報取得
-      const userInfo = await getUserInfo(currentUserUid);
-      assignedDoctorUid = userInfo.assignedDoctor;
-      if (!assignedDoctorUid) {
-        alert("担当医者が割り当てられていません");
-        assignedDoctorNameElem.textContent = "担当医者なし";
-        return;
-      }
+            // 初期状態では送信ボタンを無効化
+            sendButton.disabled = true;
+        }
 
-      // chatRoomIdをUID昇順で統一して作成
-      chatRoomId = [currentUserUid, assignedDoctorUid].sort().join("_");
+        // メッセージ送信
+        async function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message || !assignedDoctor) return;
+            
+            try {
+                // メッセージをFirestoreに保存
+                await db.collection('chats').add({
+                    senderId: currentUser.uid,
+                    senderName: currentUser.displayName || '患者',
+                    receiverId: assignedDoctor.uid,
+                    receiverName: assignedDoctor.displayName || '担当医師',
+                    message: message,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    type: 'patient_to_doctor'
+                });
+                
+                // チャット画面にメッセージを表示
+                addMessageToChat('sent', message);
+                
+                // 入力欄をクリア
+                messageInput.value = '';
+                document.getElementById('charCount').textContent = '0/500';
+                
+                // 送信ボタンを無効化
+                document.getElementById('sendButton').disabled = true;
+                
+            } catch (error) {
+                console.error('メッセージの送信に失敗:', error);
+                alert('メッセージの送信に失敗しました。');
+            }
+        }
 
-      // 担当医者名表示
-      displayAssignedDoctor();
+        // チャット画面にメッセージを追加
+        function addMessageToChat(type, message) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const timestamp = new Date().toLocaleTimeString('ja-JP', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="message-text">${message}</div>
+                    <div class="message-time">${timestamp}</div>
+                </div>
+            `;
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
 
-      // メッセージ受信監視
-      const chatRef = ref(db, "messages/" + chatRoomId);
-      onChildAdded(chatRef, (snapshot) => {
-        const msg = snapshot.val();
-        displayMessage(msg);
-      });
-    });
-  </script>
+        // リアルタイムでメッセージを受信
+        function listenForMessages() {
+            if (!assignedDoctor) return;
+            
+            db.collection('chats')
+                .where('senderId', '==', assignedDoctor.uid)
+                .where('receiverId', '==', currentUser.uid)
+                .orderBy('timestamp', 'asc')
+                .onSnapshot(function(snapshot) {
+                    snapshot.docChanges().forEach(function(change) {
+                        if (change.type === 'added') {
+                            const messageData = change.doc.data();
+                            addMessageToChat('received', messageData.message);
+                        }
+                    });
+                });
+        }
+
+        // 担当医師が設定されたらメッセージ監視を開始
+        function startMessageListening() {
+            if (assignedDoctor) {
+                listenForMessages();
+                document.getElementById('chatStatus').textContent = '接続済み';
+                document.getElementById('chatStatus').className = 'chat-status connected';
+            }
+        }
+
+        // 担当医師情報が更新されたらメッセージ監視を開始
+        const originalDisplayDoctorInfo = displayDoctorInfo;
+        displayDoctorInfo = function() {
+            originalDisplayDoctorInfo();
+            startMessageListening();
+        };
+    </script>
+
+    <style>
+        .content-area {
+            padding: 2rem 0;
+        }
+
+        .doctor-info {
+            margin-bottom: 2rem;
+        }
+
+        .doctor-info h2 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .doctor-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(67, 160, 71, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .doctor-avatar {
+            font-size: 3rem;
+            width: 80px;
+            height: 80px;
+            background: #e8f5e9;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .doctor-details h3 {
+            color: var(--text-color);
+            margin: 0 0 0.5rem 0;
+            font-size: 1.3rem;
+        }
+
+        .doctor-details p {
+            color: #666;
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(67, 160, 71, 0.1);
+            overflow: hidden;
+            max-width: 800px;
+            margin: 0 auto;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+        }
+
+        .chat-status {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.75rem;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+        }
+
+        .chat-status.connected {
+            background: rgba(76, 175, 80, 0.8);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .welcome-message {
+            text-align: center;
+            color: #666;
+            padding: 2rem;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+        }
+
+        .message.sent {
+            justify-content: flex-end;
+        }
+
+        .message.received {
+            justify-content: flex-start;
+        }
+
+        .message-content {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 18px;
+            position: relative;
+        }
+
+        .message.sent .message-content {
+            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.received .message-content {
+            background: white;
+            color: var(--text-color);
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-text {
+            margin-bottom: 0.25rem;
+            line-height: 1.4;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            text-align: right;
+        }
+
+        .chat-input-area {
+            padding: 1rem 1.5rem;
+            background: #f8f9fa;
+            border-top: 1px solid #e0e0e0;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+        #messageInput:focus {
+            border-color: #43a047;
+        }
+
+        #sendButton {
+            padding: 0.75rem 1.5rem;
+            background: #43a047;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            white-space: nowrap;
+        }
+
+        #sendButton:hover:not(:disabled) {
+            background: #2e7d32;
+        }
+
+        #sendButton:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .input-info {
+            text-align: right;
+        }
+
+        #charCount {
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .chat-container {
+                height: 500px;
+                margin: 0 1rem;
+            }
+
+            .doctor-card {
+                margin: 0 1rem;
+                padding: 1rem;
+            }
+
+            .doctor-avatar {
+                width: 60px;
+                height: 60px;
+                font-size: 2rem;
+            }
+
+            .message-content {
+                max-width: 85%;
+            }
+
+            .input-container {
+                flex-direction: column;
+            }
+
+            #sendButton {
+                width: 100%;
+            }
+        }
+    </style>
 </body>
 </html>

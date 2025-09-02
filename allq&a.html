@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIクイズ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="maintab.css">
+    <link rel="stylesheet" href="responsive.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>AIクイズ</h1>
+        </div>
+        
+        <div class="tab-container">
+            <div class="tab-header">
+                <button class="tab-button" onclick="location.href='ai.html'">
+                    <span class="tab-icon">🤖</span>
+                    <span class="tab-text">AI学習</span>
+                </button>
+                <button class="tab-button" onclick="location.href='movie.html'">
+                    <span class="tab-icon">🎬</span>
+                    <span class="tab-text">動画学習</span>
+                </button>
+                <button class="tab-button active" onclick="location.href='allq&a.html'">
+                    <span class="tab-icon">📝</span>
+                    <span class="tab-text">クイズ</span>
+                </button>
+                <button class="tab-button" onclick="location.href='score.html'">
+                    <span class="tab-icon">📊</span>
+                    <span class="tab-text">成績</span>
+                </button>
+            </div>
+            
+            <!-- モバイル用ハンバーガーメニュー -->
+            <button class="hamburger-menu show-mobile">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+        
+        <!-- モバイルメニュー -->
+        <div class="mobile-menu">
+            <a href="ai.html">🤖 AI学習</a>
+            <a href="movie.html">🎬 動画学習</a>
+            <a href="allq&a.html">📝 クイズ</a>
+            <a href="score.html">📊 成績</a>
+        </div>
+
+        <div class="content-area">
+            <div class="quiz-intro" id="quizIntro">
+                <h2>AI診断クイズ</h2>
+                <p>医療に関する知識をテストしましょう。5問のクイズに挑戦してください。</p>
+                <button onclick="startQuiz()" class="start-btn">クイズを開始</button>
+            </div>
+            
+            <div class="quiz-container" id="quizContainer" style="display: none;">
+                <div class="quiz-header">
+                    <h2>問題 <span id="questionNumber">1</span>/5</h2>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+                
+                <div class="question-card">
+                    <p id="questionText" class="question-text"></p>
+                    <div class="choices" id="choices">
+                        <!-- 選択肢がここに動的に追加されます -->
+                    </div>
+                </div>
+                
+                <div class="quiz-controls">
+                    <button onclick="submitAnswer()" class="submit-btn" id="submitBtn" disabled>回答を送信</button>
+                    <button onclick="nextQuestion()" class="next-btn" id="nextBtn" style="display: none;">次の問題</button>
+                </div>
+            </div>
+            
+            <div class="results-container" id="resultsContainer" style="display: none;">
+                <h2>クイズ完了！</h2>
+                <div class="score-display">
+                    <p>正解数: <span id="correctCount">0</span>/5</p>
+                    <p>正答率: <span id="accuracyPercent">0</span>%</p>
+                </div>
+                <div class="result-buttons">
+                    <button onclick="saveResults()" class="save-btn">結果を保存</button>
+                    <button onclick="restartQuiz()" class="restart-btn">もう一度挑戦</button>
+                    <button onclick="location.href='score.html'" class="score-btn">成績を確認</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <script src="responsive.js"></script>
+    <script>
+        // Firebase設定
+        const firebaseConfig = {
+            apiKey: "AIzaSyC31W-TEE7mIBGFwrRxJAuPugjnEFfWe_k",
+            authDomain: "web01-2484d.firebaseapp.com",
+            projectId: "web01-2484d",
+            storageBucket: "web01-2484d.appspot.com",
+            messagingSenderId: "90159472898",
+            appId: "1:90159472898:web:261ec71f9919611011e21b"
+        };
+
+        // Firebase初期化
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let currentUser = null;
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
+        let selectedAnswer = null;
+        let quizQuestions = [];
+
+        // フォールバック用のクイズ問題
+        const fallbackQuestions = [
+            {
+                question: "結核の主な症状は何ですか？",
+                choices: ["腹痛", "咳と痰", "頭痛", "関節痛"],
+                correct: 1,
+                explanation: "結核の主な症状は咳と痰、発熱、体重減少などです。"
+            },
+            {
+                question: "結核の診断に最も重要な検査は何ですか？",
+                choices: ["血液検査", "レントゲン検査", "尿検査", "心電図"],
+                correct: 1,
+                explanation: "胸部レントゲン検査は結核の診断に最も重要です。"
+            },
+            {
+                question: "結核の治療期間は通常どのくらいですか？",
+                choices: ["1週間", "1ヶ月", "6ヶ月", "1年"],
+                correct: 2,
+                explanation: "結核の標準治療は通常6ヶ月間です。"
+            },
+            {
+                question: "結核の予防に最も効果的な方法は何ですか？",
+                choices: ["手洗い", "BCGワクチン", "マスク着用", "運動"],
+                correct: 1,
+                explanation: "BCGワクチンは結核の予防に最も効果的です。"
+            },
+            {
+                question: "結核は主にどの臓器に影響を与えますか？",
+                choices: ["心臓", "肺", "肝臓", "腎臓"],
+                correct: 1,
+                explanation: "結核は主に肺に影響を与える呼吸器感染症です。"
+            }
+        ];
+
+        // ユーザー認証状態の監視
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                currentUser = user;
+                quizQuestions = [...fallbackQuestions];
+            } else {
+                console.log('ユーザーがログインしていません');
+            }
+        });
+
+        // クイズ開始
+        function startQuiz() {
+            document.getElementById('quizIntro').style.display = 'none';
+            document.getElementById('quizContainer').style.display = 'block';
+            document.getElementById('resultsContainer').style.display = 'none';
+            
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            displayQuestion();
+        }
+
+        // 問題表示
+        function displayQuestion() {
+            if (currentQuestionIndex >= 5) {
+                showResults();
+                return;
+            }
+            
+            const question = quizQuestions[currentQuestionIndex];
+            document.getElementById('questionNumber').textContent = currentQuestionIndex + 1;
+            document.getElementById('questionText').textContent = question.question;
+            
+            const choicesContainer = document.getElementById('choices');
+            choicesContainer.innerHTML = '';
+            
+            question.choices.forEach((choice, index) => {
+                const choiceBtn = document.createElement('button');
+                choiceBtn.className = 'choice-btn';
+                choiceBtn.textContent = choice;
+                choiceBtn.onclick = () => selectChoice(index);
+                choicesContainer.appendChild(choiceBtn);
+            });
+            
+            // 進捗バーの更新
+            const progress = ((currentQuestionIndex + 1) / 5) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // ボタンの状態をリセット
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('nextBtn').style.display = 'none';
+            selectedAnswer = null;
+        }
+
+        // 選択肢選択
+        function selectChoice(index) {
+            // 既存の選択をクリア
+            document.querySelectorAll('.choice-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            
+            // 新しい選択をマーク
+            event.target.classList.add('selected');
+            selectedAnswer = index;
+            document.getElementById('submitBtn').disabled = false;
+        }
+
+        // 回答送信
+        function submitAnswer() {
+            if (selectedAnswer === null) return;
+            
+            const question = quizQuestions[currentQuestionIndex];
+            const isCorrect = selectedAnswer === question.correct;
+            
+            if (isCorrect) {
+                correctAnswers++;
+            }
+            
+            // 正解・不正解の表示
+            const choices = document.querySelectorAll('.choice-btn');
+            choices.forEach((choice, index) => {
+                if (index === question.correct) {
+                    choice.classList.add('correct');
+                } else if (index === selectedAnswer && !isCorrect) {
+                    choice.classList.add('incorrect');
+                }
+                choice.disabled = true;
+            });
+            
+            // 説明の表示
+            const explanationDiv = document.createElement('div');
+            explanationDiv.className = 'explanation';
+            explanationDiv.innerHTML = `
+                <p><strong>${isCorrect ? '正解！' : '不正解'}</strong></p>
+                <p>${question.explanation}</p>
+            `;
+            document.getElementById('choices').appendChild(explanationDiv);
+            
+            // 次の問題ボタンを表示
+            document.getElementById('submitBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = 'inline-block';
+        }
+
+        // 次の問題
+        function nextQuestion() {
+            currentQuestionIndex++;
+            displayQuestion();
+        }
+
+        // 結果表示
+        function showResults() {
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'block';
+            
+            document.getElementById('correctCount').textContent = correctAnswers;
+            const accuracy = (correctAnswers / 5) * 100;
+            document.getElementById('accuracyPercent').textContent = Math.round(accuracy);
+        }
+
+        // 結果保存
+        async function saveResults() {
+            try {
+                const accuracy = correctAnswers / 5;
+                
+                await db.collection('ai_quiz_scores').add({
+                    userId: currentUser.uid,
+                    correct: correctAnswers,
+                    total: 5,
+                    accuracy: accuracy,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                alert('結果が保存されました！');
+            } catch (error) {
+                console.error('結果の保存に失敗:', error);
+                alert('結果の保存に失敗しました。');
+            }
+        }
+
+        // クイズ再開
+        function restartQuiz() {
+            document.getElementById('quizIntro').style.display = 'block';
+            document.getElementById('quizContainer').style.display = 'none';
+            document.getElementById('resultsContainer').style.display = 'none';
+        }
+    </script>
+
+    <style>
+        .content-area {
+            padding: 2rem 0;
+        }
+
+        .quiz-intro {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+        }
+
+        .quiz-intro h2 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+            font-size: 2rem;
+        }
+
+        .quiz-intro p {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #43a047 0%, #2e7d32 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(67, 160, 71, 0.3);
+        }
+
+        .start-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(67, 160, 71, 0.4);
+        }
+
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .quiz-header h2 {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #43a047 0%, #2e7d32 100%);
+            transition: width 0.3s ease;
+            width: 20%;
+        }
+
+        .question-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(67, 160, 71, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .choices {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .choice-btn {
+            padding: 1rem 1.5rem;
+            border: 2px solid #e8f5e9;
+            border-radius: 8px;
+            background: white;
+            color: var(--text-color);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+
+        .choice-btn:hover:not(:disabled) {
+            border-color: #43a047;
+            background: #f1f8e9;
+        }
+
+        .choice-btn.selected {
+            border-color: #43a047;
+            background: #e8f5e9;
+        }
+
+        .choice-btn.correct {
+            border-color: #43a047;
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+
+        .choice-btn.incorrect {
+            border-color: #f44336;
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .choice-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+        }
+
+        .explanation {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f1f8e9;
+            border-radius: 8px;
+            border-left: 4px solid #43a047;
+        }
+
+        .explanation p {
+            margin: 0.5rem 0;
+            color: #2e7d32;
+        }
+
+        .quiz-controls {
+            text-align: center;
+        }
+
+        .submit-btn, .next-btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 0 0.5rem;
+        }
+
+        .submit-btn {
+            background: #43a047;
+            color: white;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: #2e7d32;
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .next-btn {
+            background: #2196f3;
+            color: white;
+        }
+
+        .next-btn:hover {
+            background: #1976d2;
+        }
+
+        .results-container {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .results-container h2 {
+            color: var(--text-color);
+            margin-bottom: 2rem;
+            font-size: 2rem;
+        }
+
+        .score-display {
+            background: white;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(67, 160, 71, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .score-display p {
+            font-size: 1.5rem;
+            color: var(--text-color);
+            margin: 1rem 0;
+        }
+
+        .result-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .save-btn, .restart-btn, .score-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn {
+            background: #43a047;
+            color: white;
+        }
+
+        .save-btn:hover {
+            background: #2e7d32;
+        }
+
+        .restart-btn {
+            background: #ff9800;
+            color: white;
+        }
+
+        .restart-btn:hover {
+            background: #f57c00;
+        }
+
+        .score-btn {
+            background: #2196f3;
+            color: white;
+        }
+
+        .score-btn:hover {
+            background: #1976d2;
+        }
+
+        @media (max-width: 768px) {
+            .quiz-container {
+                margin: 0 1rem;
+            }
+
+            .question-card {
+                padding: 1.5rem;
+            }
+
+            .question-text {
+                font-size: 1.1rem;
+            }
+
+            .choice-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.95rem;
+            }
+
+            .result-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .submit-btn, .next-btn {
+                margin: 0.5rem 0;
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+    </style>
+</body>
+</html>

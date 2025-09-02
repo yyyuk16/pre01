@@ -1,149 +1,180 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>先生と話そう</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      /* ピンクメインのカラーパレット */
-      --color-pink-light: #FFE4E8; /* 薄いピンク */
-      --color-pink: #FFB6C1;      /* メインピンク */
-      --color-pink-dark: #FF7080; /* 濃いピンク */
-      --color-pink-accent: #FF4D6D; /* アクセントピンク */
-      --color-pink-gradient: #FF8FA3; /* グラデーション用ピンク */
-
-      /* アプリケーションで使用する色変数 */
-      --primary-color: var(--color-pink);
-      --secondary-color: var(--color-pink-dark);
-      --accent-color: var(--color-pink-accent);
-      --background-color: #FFF5F6;
-      --text-color: #1A1A1A;
-      --shadow-color: rgba(255, 112, 128, 0.15);
-      --card-bg: rgba(255, 255, 255, 0.95);
-    }
-
-    body {
-      font-family: 'Noto Sans JP', sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: linear-gradient(135deg, var(--color-pink-light), var(--color-pink));
-      min-height: 100vh;
-      color: var(--text-color);
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      background-color: var(--card-bg);
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 8px 16px var(--shadow-color);
-    }
-
-    h1 {
-      color: var(--secondary-color);
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    #chatBox {
-      border: 2px solid var(--color-pink-light);
-      border-radius: 16px;
-      padding: 20px;
-      width: calc(100% - 40px);
-      max-width: 100%;
-      height: 400px;
-      overflow-y: auto;
-      background-color: var(--card-bg);
-      margin-bottom: 20px;
-      box-shadow: 0 4px 6px var(--shadow-color);
-      box-sizing: border-box;
-    }
-
-    .input-area {
-      display: flex;
-      gap: 1rem;
-    }
-
-    #userInput {
-      flex: 1;
-      padding: 12px 24px;
-      border: 2px solid var(--color-pink-light);
-      border-radius: 12px;
-      font-size: 16px;
-      background: var(--card-bg);
-      transition: all 0.3s ease;
-    }
-
-    #userInput:focus {
-      outline: none;
-      border-color: var(--primary-color);
-      box-shadow: 0 0 0 3px var(--shadow-color);
-    }
-
-    #sendBtn {
-      padding: 12px 24px;
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 4px 6px var(--shadow-color);
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
-
-    #sendBtn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px var(--shadow-color);
-    }
-
-    .back-btn {
-      padding: 12px 24px;
-      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-      color: white;
-      border: none;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      margin-top: 20px;
-      box-shadow: 0 4px 6px var(--shadow-color);
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
-
-    .back-btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px var(--shadow-color);
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIチャット</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="responsive.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#43a047',
+                        'secondary': '#2e7d32',
+                        'accent': '#66bb6a'
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-  <div class="container">
-    <h1>先生と話そう</h1>
+<body class="bg-gradient-to-br from-green-50 to-green-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-4xl">
+        <!-- ヘッダー -->
+        <div class="text-center mb-8">
+            <button onclick="location.href='ai.html'" class="bg-white text-primary px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 mb-4 inline-flex items-center">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                戻る
+            </button>
+            <h1 class="text-4xl font-bold text-primary mb-2">AIチャット</h1>
+            <p class="text-gray-600">AIと会話して学習を深めましょう</p>
+        </div>
 
-    <div id="chatBox"></div>
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="メッセージを入力してね">
-      <button id="sendBtn">送信</button>
+        <!-- チャットエリア -->
+        <div class="bg-white rounded-2xl shadow-xl p-6 mb-6">
+            <div id="chatMessages" class="h-96 overflow-y-auto mb-4 p-4 bg-gray-50 rounded-lg">
+                <div class="text-center text-gray-500">AIとの会話を開始してください</div>
+            </div>
+            
+            <div class="flex gap-2">
+                <input type="text" id="messageInput" placeholder="メッセージを入力..." 
+                       class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                <button onclick="sendMessage()" 
+                        class="bg-primary text-white px-6 py-3 rounded-lg hover:bg-secondary transition-colors duration-200">
+                    送信
+                </button>
+            </div>
+        </div>
+
+        <!-- 設定エリア -->
+        <div class="bg-white rounded-2xl shadow-xl p-6">
+            <h2 class="text-2xl font-bold text-primary mb-4">設定</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">APIトークン</label>
+                    <input type="password" id="apiToken" placeholder="Hugging Face APIトークンを入力" 
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                    <button onclick="saveApiToken()" 
+                            class="mt-2 bg-accent text-white px-4 py-2 rounded-lg hover:bg-primary transition-colors duration-200">
+                        保存
+                    </button>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">モデル選択</label>
+                    <select id="modelSelect" 
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent">
+                        <option value="gpt2">GPT-2</option>
+                        <option value="rinna/japanese-gpt2-small">Rinna Japanese GPT-2</option>
+                        <option value="microsoft/DialoGPT-medium">DialoGPT Medium</option>
+                    </select>
+                </div>
+            </div>
+        </div>
     </div>
-    <button onclick="goBack()" class="back-btn">← 戻る</button>
-  </div>
 
-  <script src="teacher.js"></script>
-  <script>
-    document.getElementById("sendBtn").addEventListener("click", realSendMessage);
-    document.getElementById("userInput").addEventListener("keypress", function (e) {
-      if (e.key === "Enter") realSendMessage();
-    });
+    <script src="responsive.js"></script>
+    <script>
+        // APIトークンの保存と読み込み
+        function saveApiToken() {
+            const token = document.getElementById('apiToken').value;
+            if (token) {
+                localStorage.setItem('huggingface_token', token);
+                alert('APIトークンが保存されました');
+            } else {
+                alert('APIトークンを入力してください');
+            }
+        }
 
-    function goBack() {
-      window.location.href = 'ai.html';
-    }
-  </script>
+        // 保存されたAPIトークンを読み込み
+        function loadApiToken() {
+            const token = localStorage.getItem('huggingface_token');
+            if (token) {
+                document.getElementById('apiToken').value = token;
+            }
+        }
+
+        // ページ読み込み時にAPIトークンを読み込み
+        window.addEventListener('load', loadApiToken);
+
+        // メッセージ送信
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // ユーザーメッセージを表示
+            addMessage('user', message);
+            input.value = '';
+            
+            // AI応答を取得
+            await getAIResponse(message);
+        }
+
+        // メッセージ表示
+        function addMessage(sender, text) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `mb-4 p-3 rounded-lg ${sender === 'user' ? 'bg-primary text-white ml-auto' : 'bg-gray-200 text-gray-800'} max-w-xs`;
+            messageDiv.textContent = text;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // AI応答取得
+        async function getAIResponse(userMessage) {
+            const token = localStorage.getItem('huggingface_token');
+            const model = document.getElementById('modelSelect').value;
+            
+            if (!token) {
+                addMessage('ai', 'APIトークンが設定されていません。設定からAPIトークンを入力してください。');
+                return;
+            }
+            
+            try {
+                addMessage('ai', '考え中...');
+                
+                const response = await fetch(`https://api-inference.huggingface.co/models/${model}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        inputs: userMessage,
+                        parameters: {
+                            max_length: 100,
+                            temperature: 0.7,
+                            do_sample: true
+                        }
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const aiResponse = data[0]?.generated_text || '応答を生成できませんでした';
+                    addMessage('ai', aiResponse);
+                } else {
+                    addMessage('ai', `エラー: ${response.status} - ${response.statusText}`);
+                }
+            } catch (error) {
+                addMessage('ai', `通信エラー: ${error.message}`);
+            }
+        }
+
+        // Enterキーで送信
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
 </body>
 </html>
